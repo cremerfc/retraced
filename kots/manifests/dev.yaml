@@ -36,7 +36,6 @@ metadata:
     retraceddev: "1"
     tier: api
   name: retraced-api
-  namespace: default
 spec:
   ports:
   - name: http
@@ -56,7 +55,6 @@ metadata:
     retraceddev: "1"
     tier: nsq
   name: retraced-nsqd
-  namespace: default
 spec:
   ports:
   - name: tcp
@@ -77,7 +75,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-api
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -159,7 +156,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-cron
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -211,7 +207,6 @@ metadata:
     retraceddev: "1"
     tier: dbutil
   name: retraced-dbutil
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -244,7 +239,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-nsqd
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -292,7 +286,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-processor
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -368,7 +361,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-migrate-es-1-4-6
-  namespace: default
 spec:
   template:
     metadata:
@@ -403,7 +395,6 @@ metadata:
   labels:
     retraceddev: "1"
   name: retraced-migrate-pg-1-4-6
-  namespace: default
 spec:
   template:
     metadata:
