@@ -13,34 +13,6 @@ spec:
         app: auditlog
         tier: processor
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: "kubernetes.io/os"
-                operator: In
-                values:
-                - linux
-              - key: "kubernetes.io/arch"
-                operator: In
-                values:
-                - amd64
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - auditlog
-                - key: tier
-                  operator: In
-                  values:
-                  - processor
-              topologyKey: kubernetes.io/hostname
-            weight: 2
       containers:
       - command:
         - /src/processor
@@ -101,8 +73,6 @@ spec:
             cpu: 1000m
       imagePullSecrets:
       - name: auditlog-imagepull-secret
-      nodeSelector:
-        replicated/node-pool: privileged
       volumes:
       - emptyDir: {}
         name: tmpdir

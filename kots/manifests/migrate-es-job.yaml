@@ -24,6 +24,4 @@ spec:
         name: db
       imagePullSecrets:
       - name: auditlog-imagepull-secret
-      nodeSelector:
-        replicated/node-pool: privileged
       restartPolicy: Never

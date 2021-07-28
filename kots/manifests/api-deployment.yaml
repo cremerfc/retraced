@@ -57,8 +57,6 @@ spec:
           mountPath: "/etc/selasticsearch-certs"
       imagePullSecrets:
       - name: auditlog-imagepull-secret
-      nodeSelector:
-        replicated/node-pool: privileged
       volumes:
       - name: elasticsearch-certs
         secret:
