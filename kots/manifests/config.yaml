@@ -1,0 +1,10 @@
+apiVersion: kots.io/v1beta1
+kind: Config
+metadata:
+  name: retraced-config
+spec:
+  groups:
+    - name: display_opts
+      title: Display Options
+      description: More to come here!
+

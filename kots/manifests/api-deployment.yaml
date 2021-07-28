@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: api
+  template:
+    metadata:
+      labels:
+        app: auditlog
+        tier: api
+    spec:
+      containers:
+      - command:
+        - /src/api
+        env:
+        - name: STATSD_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: STATSD_PORT
+          value: "8125"
+        - name: API_BASE_URL_PATH
+          value: /auditlog
+        - name: BUGSNAG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: API_TOKEN
+              name: auditlog
+        - name: ELASTICSEARCH_CAFILE
+          value: "/etc/selasticsearch-certs/ca.crt"
+        envFrom:
+        - secretRef:
+            name: auditlog
+        image: registry.replicated.com/library/retraced:1.4.6
+        imagePullPolicy: Always
+        name: api
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 3000
+        resources:
+          requests:
+            cpu: 100m
+          limits:
+            cpu: 500m
+        volumeMounts:
+        - name: elasticsearch-certs
+          readOnly: true
+          mountPath: "/etc/selasticsearch-certs"
+      imagePullSecrets:
+      - name: auditlog-imagepull-secret
+      nodeSelector:
+        replicated/node-pool: privileged
+      volumes:
+      - name: elasticsearch-certs
+        secret:
+          secretName: auditlog-platform-es-http-certs-public

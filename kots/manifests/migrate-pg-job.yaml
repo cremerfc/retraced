@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-pg-1-4-6
+spec:
+  template:
+    spec:
+      containers:
+      - command:
+        - /src/retraceddb
+        - pg
+        - up
+        env:
+        - name: BUGSNAG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: DB_TOKEN
+              name: auditlog
+        - name: SCHEMA_PATH
+          value: /src/migrations/pg10
+        envFrom:
+        - secretRef:
+            name: auditlog
+        image: registry.replicated.com/library/retraced:1.4.6
+        imagePullPolicy: IfNotPresent
+        name: db
+      imagePullSecrets:
+      - name: auditlog-imagepull-secret
+      nodeSelector:
+        replicated/node-pool: privileged
+      restartPolicy: Never
