@@ -8,6 +8,4 @@ spec:
 
   statusInformers:
     - deployment/app-direct
-  additionalNamespaces:
-    - auditlog-platform
   
