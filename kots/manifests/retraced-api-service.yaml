@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: auditlog
+    retraceddev: "1"
+    tier: api
+  name: retraced-api
+  namespace: '{{repl Namespace}}'
+spec:
+  ports:
+  - name: http
+    port: 3000
+    targetPort: http
+  selector:
+    app: auditlog
+    retraceddev: "1"
+    tier: api
+  type: NodePort

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: retraced-elasticsearch
+  namespace: '{{repl Namespace}}'
+spec:
+  selector:
+    matchLabels:
+      app: elasticsearch
+  serviceName: elasticearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - image: elasticsearch:7.8.0
+        imagePullPolicy: IfNotPresent
+        name: elasticsearch
+        ports:
+        - containerPort: 9200
+          name: estransport
+        volumeMounts:
+        - mountPath: /usr/share/elasticsearch/data
+          name: esdatadir
+        - mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          name: elasticsearch
+          subPath: elasticsearch.yml
+      volumes:
+      - name: esdatadir
+        persistentVolumeClaim:
+          claimName: esdatadir
+      - configMap:
+          items:
+          - key: elasticsearch.yml
+            path: elasticsearch.yml
+          name: elasticsearch
+        name: elasticsearch
+  volumeClaimTemplates:
+  - metadata:
+      name: esdatadir
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi

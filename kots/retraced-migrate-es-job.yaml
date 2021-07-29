@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    retraceddev: "1"
+  name: retraced-migrate-es-1-4-6
+  namespace: '{{repl Namespace}}'
+spec:
+  template:
+    metadata:
+      labels:
+        retraceddev: "1"
+    spec:
+      containers:
+      - name: db
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+        - node
+        - --inspect=0.0.0.0
+        - -r
+        - ts-node/register
+        - src/_db/runner-lite.ts
+        - es
+        env:
+        - name: BUGSNAG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: DB_TOKEN
+              name: auditlog
+        envFrom:
+        - secretRef:
+            name: auditlog
+      imagePullSecrets: []
+      restartPolicy: Never

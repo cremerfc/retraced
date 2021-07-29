@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    retraceddev: "1"
+  name: retraced-api
+  namespace: '{{repl Namespace}}'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      retraceddev: "1"
+      tier: api
+  template:
+    metadata:
+      labels:
+        app: auditlog
+        retraceddev: "1"
+        tier: api
+    spec:
+      initContainers:
+      - name: bootstrap
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - /src/bin/retracedctl
+            bootstrap
+            --projectName   "$BOOTSTRAP_PROJECT_NAME"
+            --projectId     "$BOOTSTRAP_PROJECT_ID"
+            --environmentId "$BOOTSTRAP_ENVIRONMENT_ID"
+            --apiKey        "$BOOTSTRAP_API_TOKEN"
+        envFrom:
+          - secretRef:
+              name: auditlog
+        env:
+        - name: BOOTSTRAP_PROJECT_NAME
+          value: dev
+        - name: BOOTSTRAP_PROJECT_ID
+          value: dev
+        - name: BOOTSTRAP_ENVIRONMENT_ID
+          value: dev
+        - name: BOOTSTRAP_API_TOKEN
+          value: dev
+        - name: PG_SEARCH
+          value: "1"
+      containers:
+      - name: api
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+        - /src/api
+        env:
+        - name: EXPORT_PAGE_SIZE_INTERNAL
+          value: "2"
+        - name: BUGSNAG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: API_TOKEN
+              name: auditlog
+        - name: PG_SEARCH
+          value: "1"
+        envFrom:
+        - secretRef:
+            name: auditlog
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9229
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 3000
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 100m

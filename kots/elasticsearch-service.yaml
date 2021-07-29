@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch
+  name: retraced-elasticsearch
+  namespace: '{{repl Namespace}}'
+spec:
+  ports:
+  - nodePort: 30920
+    port: 9200
+    targetPort: estransport
+  selector:
+    app: elasticsearch
+  type: NodePort

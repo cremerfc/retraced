@@ -1,0 +1,16 @@
+apiVersion: troubleshoot.replicated.com/v1beta1
+kind: Collector
+metadata:
+  name: support-collector
+spec:
+  collectors:
+    - clusterInfo: {}
+    - clusterResources: {}
+    - logs:
+        collectorName: retraced
+        name: retraced
+        selector:
+          - app=auditlog
+        limits:
+          maxAge: 5d
+          maxLines: 10000

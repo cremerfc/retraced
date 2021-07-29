@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    retraceddev: "1"
+  name: retraced-processor
+  namespace: '{{repl Namespace}}'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      retraceddev: "1"
+      tier: processor
+  template:
+    metadata:
+      labels:
+        app: auditlog
+        retraceddev: "1"
+        tier: processor
+    spec:
+      containers:
+      - name: processor
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+        - /src/processor
+        env:
+        - name: TMPDIR
+          value: /tmp
+        - name: NO_WARP_PIPE
+          value: "1"
+        - name: BUGSNAG_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: PROCESSOR_TOKEN
+              name: auditlog
+        - name: PG_SEARCH
+          value: "1"
+        envFrom:
+        - secretRef:
+            name: auditlog
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 1
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 2
+          httpGet:
+            path: /healthz
+            port: 3000
+          initialDelaySeconds: 3
+          periodSeconds: 1
+          successThreshold: 2
+        resources:
+          limits:
+            cpu: 1000m
+          requests:
+            cpu: 100m
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmpdir
+      imagePullSecrets: []
+      volumes:
+      - emptyDir: {}
+        name: tmpdir
