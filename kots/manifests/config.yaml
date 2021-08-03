@@ -4,7 +4,15 @@ metadata:
   name: retraced-config
 spec:
   groups:
-    - name: display_opts
-      title: Display Options
-      description: More to come here!
-
+    - name: retraced
+      title: Retraced
+      description: Retraced Configuration
+      items:
+        - name: hmac_secret_admin
+          title: HMAC Admin Secret
+          type: password
+          default: 'retraced'
+        - name: hmac_secret_view
+          title: HMAC View Secret
+          type: password
+          default: 'retraced'
