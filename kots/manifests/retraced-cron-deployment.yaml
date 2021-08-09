@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    retraceddev: "1"
+  name: retraced-cron
+  namespace: '{{repl Namespace}}'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      retraceddev: "1"
+      tier: cron
+  template:
+    metadata:
+      labels:
+        app: auditlog
+        dest: nsq
+        retraceddev: "1"
+        source: cron
+        tier: cron
+    spec:
+      containers:
+      - name: cron
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+        - /bin/sh
+        - -c
+        - /usr/local/bin/replicated-auditlog-cron /crontab 2>&1 | grep ERRO
+        env:
+        - name: NSQD_HOST
+          valueFrom:
+            secretKeyRef:
+              key: NSQD_HOST
+              name: auditlog
+        - name: NSQD_HTTP_PORT
+          valueFrom:
+            secretKeyRef:
+              key: NSQD_HTTP_PORT
+              name: auditlog
+        - name: RETRACED_DISABLE_GEOSYNC
+          value: "1"
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 100m
+          requests:
+            cpu: 10m
+      imagePullSecrets: []

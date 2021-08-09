@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: retraced
+    retraceddev: "1"
+    tier: dbutil
+  name: retraced-dbutil
+  namespace: '{{repl Namespace}}'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: retraced
+      retraceddev: "1"
+      tier: dbutil
+  template:
+    metadata:
+      labels:
+        app: retraced
+        retraceddev: "1"
+        tier: dbutil
+    spec:
+      containers:
+      - name: dbutil
+        image: registry.replicated.com/library/retraced:1.4.6
+        command:
+          - /bin/sleep
+          - infinity
+        envFrom:
+        - secretRef:
+            name: auditlog

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    retraceddev: "1"
+  name: retraced-nsqd
+  namespace: '{{repl Namespace}}'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      retraceddev: "1"
+      tier: nsq
+  template:
+    metadata:
+      labels:
+        app: auditlog
+        retraceddev: "1"
+        tier: nsq
+    spec:
+      containers:
+      - name: nsqd
+        image: nsqio/nsq:v1.0.0-compat
+        command:
+        - /bin/sh
+        args:
+        - -c
+        - nsqd -statsd-address ${STATSD_HOST}:${STATSD_PORT} -statsd-prefix "nsqd."
+        env:
+        - name: STATSD_HOST
+          valueFrom:
+            secretKeyRef:
+              key: STATSD_HOST
+              name: auditlog
+        - name: STATSD_PORT
+          valueFrom:
+            secretKeyRef:
+              key: STATSD_PORT
+              name: auditlog
+        ports:
+        - containerPort: 4150
+        - containerPort: 4151
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 100m
